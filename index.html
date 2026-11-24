@@ -1,0 +1,2033 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Движение мысли</title>
+  <style>
+    body { margin: 0; background: #eae8e0; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <template id="screen-home">
+    <style>
+    :host { display: block; min-height: 100svh; }
+
+    * { box-sizing: border-box; }
+    :host {
+      margin: 0;
+      background: #eae8e0;
+      color: #202824;
+      font-family: system-ui, sans-serif;
+    }
+    main {
+      width: min(100%, 460px);
+      min-height: 100svh;
+      margin-inline: auto;
+      display: flex;
+      flex-direction: column;
+      background: #f3f0e8;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 50svh;
+      object-fit: cover;
+      object-position: center 40%;
+    }
+    .welcome {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: calc(4px + 10svh) clamp(22px, 7vw, 38px) max(28px, env(safe-area-inset-bottom));
+    }
+    .title-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+    }
+    h1 {
+      margin: 0;
+      color: #39453c;
+      font-size: clamp(24px, 8.2vw, 38px);
+      font-weight: 560;
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+    .translation {
+      margin: 9px 0 0;
+      color: #596257;
+      font-size: clamp(11px, 3.4vw, 15px);
+    }
+    .touch {
+      display: grid;
+      place-items: center;
+      width: clamp(76px, 22vw, 100px);
+      height: 90px;
+      color: #39453c;
+      border-radius: 50%;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .touch::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      cursor: pointer;
+    }
+    .touch:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+    .touch:active { background: #39453c16; }
+    .fingerprint {
+      position: relative;
+      top: 15svh;
+      width: 40px;
+      height: 46px;
+      transform: rotate(-12deg) scale(1.68);
+    }
+    .fingerprint span {
+      position: absolute;
+      inset: var(--inset);
+      border: 1.5px solid currentColor;
+      border-bottom-color: transparent;
+      border-radius: 49% 51% 46% 54%;
+      transform: rotate(var(--turn, 0deg));
+    }
+    .fingerprint span:nth-child(1) { --inset: 0; --turn: -10deg; }
+    .fingerprint span:nth-child(2) { --inset: 4px; --turn: 12deg; }
+    .fingerprint span:nth-child(3) { --inset: 8px; --turn: 27deg; }
+    .fingerprint span:nth-child(4) { --inset: 12px; --turn: -19deg; }
+    .fingerprint span:nth-child(5) { --inset: 16px; --turn: 18deg; }
+      </style>
+  <main>
+    <canvas id="tree" width="780" height="800" role="img"
+            aria-label="Крупный план верхней ветки сосны, нарисованной тушью"></canvas>
+    <section class="welcome" aria-labelledby="title">
+      <div class="title-row">
+        <div>
+          <h1 id="title" lang="ko">생각의 움직임</h1>
+          <p class="translation">Движение мысли</p>
+        </div>
+        <a class="touch" href="#menu" aria-label="Открыть меню">
+          <span class="fingerprint" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </span>
+        </a>
+      </div>
+    </section>
+  </main>
+    </template>
+  <template id="screen-menu">
+    <style>
+    :host { display: block; min-height: 100svh; }
+
+    * { box-sizing: border-box; }
+    :host {
+      margin: 0;
+      background: #eae8e0;
+      color: #202824;
+      font-family: system-ui, sans-serif;
+    }
+    main {
+      width: min(100%, 600px);
+      min-height: 100svh;
+      margin-inline: auto;
+      display: grid;
+      place-items: center;
+      overflow-x: clip;
+      padding: 0;
+      background: #f3f0e8;
+    }
+    .tower {
+      width: min(84%, 390px);
+      display: grid;
+      gap: 1px;
+    }
+    .menu-scene {
+      width: min(100%, 460px);
+      display: grid;
+      justify-items: center;
+    }
+    .sprig-home {
+      display: block;
+      width: min(95%, 410px);
+      margin: clamp(20px, 6svh, 54px) 0 0;
+    }
+    .sprig-home:focus-visible { outline: 2px solid #39453c; outline-offset: 3px; }
+    .sprig-home:active { opacity: 0.8; }
+    .sprig { display: block; width: 100%; height: auto; }
+    .block-link {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: clamp(7px, 3vw, 16px);
+      min-height: clamp(68px, 12svh, 102px);
+      padding: 0 clamp(9px, 3vw, 19px);
+      border-bottom: 1px solid #39453c35;
+      color: #39453c;
+      text-decoration: none;
+      touch-action: manipulation;
+      transition: background-color 160ms;
+    }
+    .block-link:first-of-type { border-top: 1px solid #39453c35; }
+    .block-link:hover, .block-link:active { background: #39453c0d; }
+    .block-link:focus-visible { outline: 2px solid #39453c; outline-offset: 3px; }
+    .stack-label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .stack-label strong {
+      font-size: clamp(23px, 7.7vw, 36px);
+      font-weight: 560;
+      line-height: 1;
+      letter-spacing: -0.035em;
+    }
+    .caption { color: #596257; font-size: clamp(11px, 3.4vw, 15px); white-space: nowrap; }
+    .arrow { grid-column: 2; grid-row: 1; color: #626b5d; font-size: 17px; }
+    @media (prefers-reduced-motion: reduce) { .block-link { transition: none; } }
+    .section {
+      display: none;
+      width: min(100%, 460px);
+      align-self: start;
+      padding: 24px clamp(20px, 6vw, 32px) max(32px, env(safe-area-inset-bottom));
+    }
+    :host([data-screen="afterword"]) .section { display: block; }
+    :host([data-screen="afterword"]) .menu-scene { display: none; }
+    .afterword-heading { margin: clamp(24px, 7vh, 62px) 0 24px; }
+    .afterword-heading h1 {
+      margin: 0;
+      color: #39453c;
+      font-size: clamp(44px, 13vw, 64px);
+      font-weight: 650;
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+    }
+    .afterword-heading p {
+      margin: 7px 0 0;
+      color: #626b5d;
+      text-shadow: 3px 4px 7px #59645155;
+      font: 400 clamp(20px, 6vw, 29px)/1.2 Georgia, serif;
+    }
+    .afterword-copy { color: #475248; font-size: 16px; line-height: 1.55; }
+    .afterword-copy p { margin: 0 0 14px; }
+    .afterword-copy h2 {
+      margin: 25px 0 12px;
+      padding-top: 18px;
+      border-top: 1px solid #39453c35;
+      color: #39453c;
+      font-size: 19px;
+      font-weight: 600;
+    }
+    .afterword-copy ol { margin: 0; padding-inline-start: 1.35em; }
+    .afterword-copy li + li { margin-top: 8px; }
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 44px;
+      margin-top: 28px;
+      padding: 8px 14px;
+      border: 1px solid #39453c72;
+      color: #39453c;
+      text-decoration: none;
+    }
+    .social-link:hover { background: #39453c0d; }
+    .social-link:focus-visible { outline: 2px solid #39453c; outline-offset: 3px; }
+    .back { color: #505950; font-size: 14px; text-underline-offset: 4px; }
+      </style>
+  <main>
+    <section class="section" id="afterword" aria-labelledby="afterword-title">
+      <a class="back" href="#menu">Вернуться</a>
+      <header class="afterword-heading">
+        <h1 id="afterword-title" lang="ko">후기</h1>
+        <p>Послесловие</p>
+      </header>
+      <div class="afterword-copy">
+        <p>Медиапроект «Движение мысли» нашёл отображение в образе сосны в корейском пейзаже тушью. Из этого образа возникла идея характера дерева и пейзажа, который меняется от движения руки под действием мысли.</p>
+        <p>Движение и мысль иногда пересекаются, а иногда дополняют друг друга. Мысль направляет жест, а жест может подсказать новую мысль. Это диалог, в котором важно удерживать равновесие: давать место и движению, и паузе.</p>
+        <h2>Как движется мысль?</h2>
+        <ol>
+          <li>В «Движении» коснитесь отпечатка.</li>
+          <li>Пока идут десять секунд, плавно наклоняйте и поворачивайте телефон, который сопровождает ваши мысли. От ваших жестов меняются размер и изгиб сосны, а направление телефона влияет на очертания гор. Резкая встряска разворачивает крону влево.</li>
+          <li>Ваши мысли и движение отразятся в кривых и изгибах, которые прекрасны потому, что они такие, а не прямые.</li>
+        </ol>
+        <a class="social-link" href="https://streamertale.tilda.ws/">
+          www <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="menu-scene">
+    <nav class="tower" aria-label="Разделы">
+      <a class="block-link" href="#movement">
+        <span class="stack-label"><strong lang="ko">움직임</strong><span class="caption">Движение</span></span>
+        <span class="arrow" aria-hidden="true">↗</span>
+      </a>
+      <a class="block-link" href="#thoughts">
+        <span class="stack-label"><strong lang="ko">생각</strong><span class="caption">Мысли</span></span>
+        <span class="arrow" aria-hidden="true">↗</span>
+      </a>
+      <a class="block-link" href="#afterword">
+        <span class="stack-label"><strong lang="ko">후기</strong><span class="caption">Послесловие</span></span>
+        <span class="arrow" aria-hidden="true">↗</span>
+      </a>
+    </nav>
+      <a class="sprig-home" href="#" aria-label="Вернуться на главный экран">
+        <canvas class="sprig" id="sprig" width="840" height="270" aria-hidden="true"></canvas>
+      </a>
+    </div>
+  </main>
+    </template>
+  <template id="screen-movement">
+    <style>
+    :host { display: block; min-height: 100svh; }
+* { box-sizing: border-box; }
+
+:host {
+  margin: 0;
+  background: #eae8e0;
+  color: #202824;
+  font-family: system-ui, sans-serif;
+}
+
+main {
+  width: min(100%, 460px);
+  min-height: 100svh;
+  margin-inline: auto;
+  padding: 24px clamp(20px, 6vw, 32px) max(24px, env(safe-area-inset-bottom));
+  background: #f3f0e8;
+}
+
+.back {
+  color: #505950;
+  font-size: 14px;
+  text-underline-offset: 4px;
+}
+
+.section-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(78px, 23vw, 100px);
+  align-items: center;
+  gap: 12px;
+  min-height: clamp(78px, 23vw, 100px);
+  margin: clamp(24px, 7vh, 62px) 0 8px;
+}
+
+.section-heading h1 {
+  margin: 0;
+  color: #39453c;
+  font-size: clamp(44px, 13vw, 64px);
+  font-weight: 650;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.translation {
+  margin: 7px 0 0;
+  color: #626b5d;
+  text-shadow: 3px 4px 7px #59645155;
+  font: 400 clamp(20px, 6vw, 29px)/1.2 Georgia, serif;
+}
+
+
+    .copy { padding-bottom: 16px; border-bottom: 1px solid #626b5d72; }
+    .copy p { margin: 10px 0 0; max-width: 36ch; color: #475248; font-size: 16px; line-height: 1.5; }
+    .touch { display: grid; place-items: center; align-self: center; width: clamp(78px, 23vw, 100px); height: clamp(78px, 23vw, 100px); padding: 0; border: 0; border-radius: 50%; background: transparent; color: #39453c; cursor: pointer; }
+    .touch:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+    .touch:active { background: #39453c16; }
+    .touch:disabled { opacity: 0.45; cursor: default; }
+    .fingerprint { position: relative; width: 40px; height: 46px; transform: rotate(-12deg) scale(1.58); }
+    .fingerprint i { position: absolute; inset: var(--inset); border: 1.5px solid currentColor; border-bottom-color: transparent; border-radius: 49% 51% 46% 54%; transform: rotate(var(--turn)); }
+    .fingerprint i:nth-child(1) { --inset: 0; --turn: -10deg; }
+    .fingerprint i:nth-child(2) { --inset: 4px; --turn: 12deg; }
+    .fingerprint i:nth-child(3) { --inset: 8px; --turn: 27deg; }
+    .fingerprint i:nth-child(4) { --inset: 12px; --turn: -19deg; }
+    .fingerprint i:nth-child(5) { --inset: 16px; --turn: 18deg; }
+    .sensor-status { margin: 10px 0 0; font-size: 13px; color: #626b5d; }
+    .drawing { display: grid; grid-template-columns: minmax(6.3rem, 1.35fr) 3fr; align-items: center; margin-top: 14px; }
+    .clock { color: #626b5d; align-self: center; justify-self: end; text-align: right; font: 400 clamp(70.2px, 20.8vw, 114.4px)/1 Georgia, serif; font-variant-numeric: tabular-nums; }
+    .clock small { display: block; margin-top: 5px; font: 13px system-ui, sans-serif; }
+    canvas { grid-column: 2; grid-row: 1; display: block; width: 100%; height: auto; }
+      </style>
+  <main>
+    <a class="back" href="#menu">Вернуться</a>
+    <header class="section-heading" aria-labelledby="title">
+      <div>
+        <h1 id="title" lang="ko">움직임</h1>
+        <p class="translation">Движение</p>
+      </div>
+      <button class="touch" id="start" type="button" aria-label="Начать отрисовку" aria-describedby="instructions">
+        <span class="fingerprint" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      </button>
+    </header>
+    <div class="copy" id="instructions">
+        <p>Движением руки, не отпуская смартфон, за 1/6 минуты вы воспроизведёте уголок Южной Кореи. Каждое колебание перейдёт в изображение, а вздох - в очертание.</p>
+        <p>На юг или на север? Ввысь или вширь? Оставьте цифровой отпечаток.</p>
+    </div>
+    <p class="sensor-status" id="sensor-status" role="status" hidden></p>
+    <div class="drawing">
+      <div class="clock" id="clock" role="timer" aria-label="Осталось секунд" hidden>
+        <span id="seconds">10</span><small>секунд</small>
+      </div>
+      <canvas id="leaf" width="600" height="560" role="img" aria-label="Фрактальный лист тушью"></canvas>
+    </div>
+  </main>
+    </template>
+  <template id="screen-thoughts">
+    <style>
+    :host { display: block; min-height: 100svh; }
+* { box-sizing: border-box; }
+
+:host {
+  margin: 0;
+  background: #eae8e0;
+  color: #202824;
+  font-family: system-ui, sans-serif;
+}
+
+main {
+  width: min(100%, 460px);
+  min-height: 100svh;
+  margin-inline: auto;
+  padding: 24px clamp(20px, 6vw, 32px) max(24px, env(safe-area-inset-bottom));
+  background: #f3f0e8;
+}
+
+.back {
+  color: #505950;
+  font-size: 14px;
+  text-underline-offset: 4px;
+}
+
+.section-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(78px, 23vw, 100px);
+  align-items: center;
+  gap: 12px;
+  min-height: clamp(78px, 23vw, 100px);
+  margin: clamp(24px, 7vh, 62px) 0 8px;
+}
+
+.section-heading h1 {
+  margin: 0;
+  color: #39453c;
+  font-size: clamp(44px, 13vw, 64px);
+  font-weight: 650;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.translation {
+  margin: 7px 0 0;
+  color: #626b5d;
+  text-shadow: 3px 4px 7px #59645155;
+  font: 400 clamp(20px, 6vw, 29px)/1.2 Georgia, serif;
+}
+
+
+    .heading-art {
+      display: block;
+      width: clamp(122px, 36vw, 164px);
+      height: auto;
+      justify-self: end;
+      transform: rotate(-18deg);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+    .poem {
+      border-top: 1px solid #39453c35;
+      padding-top: 23px;
+    }
+    .poem + .poem { margin-top: 33px; }
+    h2 { margin: 0 0 22px; color: #354139; font-size: clamp(21px, 5.8vw, 29px); font-weight: 560; }
+    .poem p { margin: 0 0 16px; font: 17px/1.58 Georgia, serif; }
+    .poem[lang="ko"] p { font-family: "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif; font-size: 16px; line-height: 1.75; word-break: keep-all; overflow-wrap: anywhere; }
+    .credit { margin: 25px 0 0; color: #596257; font-size: 13px; line-height: 1.5; }
+      </style>
+  <main>
+    <a class="back" href="#menu">Вернуться</a>
+    <header class="section-heading" aria-labelledby="title">
+      <div>
+        <h1 id="title" lang="ko">생각</h1>
+        <p class="translation">Мысли</p>
+      </div>
+      <canvas class="heading-art" id="sprig" width="840" height="270" aria-hidden="true"></canvas>
+    </header>
+    <article aria-labelledby="original-title">
+      <section class="poem" lang="ko" aria-labelledby="original-title">
+        <h2 id="original-title">윤선도의 ‘오우가’</h2>
+        <p>나의 벗이 몇이나 있느냐 헤아려 보니 물과 돌과 소나무, 대나무로다<br>
+          동산에 달 오르니 그것 참 더욱 반갑구나<br>
+          두어라! 이 다섯이면 그만이지 또 더하여 무엇 하리</p>
+        <p>구름 빛이 좋다 하나 검기를 자주 한다<br>
+          바람 소리 맑다 하나 그칠 때가 하도 많다<br>
+          깨끗하고도 그치지 않은 것은 물뿐인가 하노라 【수(水)】</p>
+        <p>꽃은 무슨 일로 피자마자 빨리 지고<br>
+          풀은 어이하여 푸르다가 누래지는가<br>
+          아마도 변치 않는 것은 바위뿐인가 하노라 【석(石)】</p>
+        <p>더우면 꽃이 피고 추우면 잎 지거늘<br>
+          솔아 너는 어찌 눈서리 모르는가<br>
+          구천(九泉)에 뿌리 곧은 줄 그로하여 아노라 【송(松)】</p>
+        <p>나무도 아닌 것이 풀도 아닌 것이<br>
+          곧기는 누가 시키며 속은 어찌 비었는가<br>
+          저리하고도 사시(四時)에 푸르니 그를 좋아하노라 【죽(竹)】</p>
+        <p>작은 것이 높이 떠서 만물을 다 비추니<br>
+          한밤중에 밝은 것이 너만 한 것 또 있느냐<br>
+          보고도 말 아니하니 내 벗인가 하노라 【월(月)】</p>
+      </section>
+      <section class="poem" aria-labelledby="translation-title">
+        <h2 id="translation-title">«Оуга» Юн Сон-до</h2>
+        <p>Я посчитал, сколько у меня друзей, и это вода, камень, сосна и бамбук.<br>
+          Луна восходит над холмом, и это поистине особенно приятно.<br>
+          Оставьте это! Этих пяти достаточно; зачем добавлять ещё?</p>
+        <p>Цвет облаков хороший, но они часто темнеют.<br>
+          Шум ветра отчетливо слышен, но он так часто стихает.<br>
+          Интересно, может быть, вода — единственное, что чисто и никогда не перестаёт существовать?</p>
+        <p>По какой причине цветы быстро вянут сразу после распускания?<br>
+          Почему трава желтеет после того, как была зеленой?<br>
+          Пожалуй, единственное, что не меняется, — это скала.</p>
+        <p>Цветы распускаются в жару, а листья опадают в холод.<br>
+          Сол-а, как же так получилось, что ты не знаешь снега и инея?<br>
+          Я знаю, что у него прямые корни в девяти источниках. 【Сосна】</p>
+        <p>Что-то, что не является ни деревом, ни травой.<br>
+          Кто приказал сделать его таким прямым, и почему внутри оно пустое?<br>
+          Тем не менее, он остается зеленым на протяжении всех четырех времен года; мне это очень нравится. 【Бамбук】</p>
+        <p>Нечто маленькое возвышается и освещает всё сущее.<br>
+          Есть ли что-нибудь еще такое же яркое, как ты, посреди ночи?<br>
+          Видя его, но не говоря ни слова, я задаюсь вопросом, друг ли он мне. 【Луна】</p>
+        <footer class="credit">『Госан Юго』 Том. 6 Часть II, Дополнительный сборник, Гаса, Санджунг Сингок, «Ога»</footer>
+      </section>
+    </article>
+  </main>
+    </template>
+  <template id="screen-landscape">
+    <style>
+    :host { display: block; min-height: 100svh; }
+
+    :host {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #eae8e0;
+    }
+
+    canvas {
+      display: block;
+      width: min(100%, 760px);
+      height: auto;
+    }
+    main { width: min(100%, 760px); }
+    button {
+      display: block;
+      margin: 12px auto;
+      padding: 8px 16px;
+      border: 1px solid #9c9a8e;
+      border-radius: 4px;
+      color: #303b35;
+      background: #f3f0e8;
+      font: inherit;
+      cursor: pointer;
+    }
+    [hidden] { display: none !important; }
+    main.is-result {
+      width: min(100%, 900px);
+    }
+    .is-result canvas {
+      width: 100%;
+      max-height: calc(100svh - 60px - env(safe-area-inset-bottom, 0px));
+      object-fit: contain;
+    }
+    .result-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      padding: 5px 8px calc(7px + env(safe-area-inset-bottom, 0px));
+    }
+    .result-actions a, .result-actions button {
+      display: grid;
+      place-content: center;
+      justify-items: center;
+      gap: 4px;
+      box-sizing: border-box;
+      width: 46px;
+      height: 46px;
+      margin: 0;
+      padding: 0;
+      border: 1px solid #72776a;
+      border-radius: 0;
+      background: #f3f0e8;
+      color: #39453c;
+      text-decoration: none;
+      font: 12px system-ui, sans-serif;
+    }
+    .result-actions svg { width: 23px; height: 23px; }
+      </style>
+  <main>
+    <canvas id="tree" width="738" height="722"
+            aria-label="Сосна на скале и горы в тумане"></canvas>
+    <button id="regenerate" type="button">Новый пейзаж</button>
+    <nav class="result-actions" id="result-actions" aria-label="Действия с пейзажем" hidden>
+      <button id="save-art" type="button" aria-label="Сохранить PNG" title="Сохранить PNG">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M16 4v17m-6-6 6 6 6-6M6 21v6h20v-6"/>
+        </svg>
+      </button>
+      <a href="#" aria-label="Домой" title="Домой">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M3 15q8 0 13-9 5 9 13 9M5 17h22M9 17v9m7-9v9m7-9v9M5 26h22"/>
+        </svg>
+      </a>
+      <a href="#movement" aria-label="Ещё раз" title="Ещё раз">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M25 12a10 10 0 1 0 .5 7M25 5v8h-8"/>
+        </svg>
+      </a>
+    </nav>
+  </main>
+  </template>
+  <script>
+  function init_home(document, { signal, search, navigate, requestAnimationFrame, cancelAnimationFrame }) {
+
+  const canvas = document.querySelector("#tree");
+  const ctx = canvas.getContext("2d");
+
+  // Фиксированное зерно сохраняет рисунок при перезагрузке.
+  let seed = 37;
+  function random(min, max) {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return min + (max - min) * seed / 4294967296;
+  }
+
+  function stroke(x, y, endX, endY, color, width) {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(endX, endY);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.stroke();
+  }
+
+  // В каждой строке две контрольные точки и конец кривой Безье.
+  function samplePath(start, curves) {
+    const points = [{ x: start[0], y: start[1] }];
+    let [x, y] = start;
+
+    for (const [ax, ay, bx, by, endX, endY] of curves) {
+      for (let step = 1; step <= 24; step++) {
+        const t = step / 24;
+        const s = 1 - t;
+        points.push({
+          x: s ** 3 * x + 3 * s ** 2 * t * ax
+            + 3 * s * t ** 2 * bx + t ** 3 * endX,
+          y: s ** 3 * y + 3 * s ** 2 * t * ay
+            + 3 * s * t ** 2 * by + t ** 3 * endY
+        });
+      }
+      x = endX;
+      y = endY;
+    }
+
+    return points.map((point, i) => {
+      const before = points[Math.max(0, i - 1)];
+      const after = points[Math.min(points.length - 1, i + 1)];
+      const angle = Math.atan2(after.y - before.y, after.x - before.x);
+      return { ...point, angle, nx: -Math.sin(angle), ny: Math.cos(angle) };
+    });
+  }
+
+  function drawWood(path, baseWidth, tipWidth) {
+    const last = path.length - 1;
+    const halfWidths = path.map((_, i) =>
+      (tipWidth + (baseWidth - tipWidth) * (1 - i / last) ** 1.2) / 2
+    );
+
+    function edge(point, i, side) {
+      const distance = side * halfWidths[i] * random(0.83, 1.16);
+      return [point.x + point.nx * distance, point.y + point.ny * distance];
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(...edge(path[0], 0, 1));
+    for (let i = 1; i <= last; i++) ctx.lineTo(...edge(path[i], i, 1));
+    for (let i = last; i >= 0; i--) ctx.lineTo(...edge(path[i], i, -1));
+    ctx.closePath();
+    ctx.fillStyle = "#373a37";
+    ctx.fill();
+
+    // Обрезка удерживает штрихи внутри силуэта коры.
+    ctx.save();
+    ctx.clip();
+
+    const barkColors = ["#181e1b", "#515650", "#777b74", "#a5a79e"];
+    for (let i = 0; i < last; i++) {
+      const p = path[i];
+      const q = path[Math.min(last, i + Math.floor(random(1, 5)))];
+
+      for (let j = 0; j < 5; j++) {
+        const offset = random(-1, 1) * halfWidths[i];
+        const endOffset = offset + random(-2, 2);
+        stroke(
+          p.x + p.nx * offset, p.y + p.ny * offset,
+          q.x + q.nx * endOffset, q.y + q.ny * endOffset,
+          barkColors[Math.floor(random(0, barkColors.length))],
+          random(0.5, 1.9)
+        );
+      }
+    }
+
+    ctx.restore();
+  }
+
+  const greens = ["#14201c", "#303b35", "#4d5550", "#777d76"];
+
+  function drawNeedles(x, y, direction) {
+    for (let i = 0; i < 34; i++) {
+      const baseX = x + random(-18, 18);
+      const baseY = y + random(-4, 4);
+      const angle = direction + random(-0.7, 0.7);
+      const length = random(4, 10);
+      stroke(
+        baseX, baseY,
+        baseX + Math.cos(angle) * length, baseY + Math.sin(angle) * length,
+        greens[Math.floor(random(0, greens.length))], random(0.6, 1.8)
+      );
+    }
+  }
+
+  function drawCrown(path, spread, forkAt = null) {
+    const last = path.length - 1;
+
+    // Редкие пучки у основания, более густые к концам.
+    let tuft = 0;
+    for (let i = Math.ceil(last * 0.18); i <= last; i += i < last * 0.45 ? 4 : 3) {
+      const position = i / last;
+      if (forkAt !== null && Math.abs(position - forkAt) < 0.09) continue;
+
+      const p = path[i];
+      const side = Math.cos(p.angle) < 0 ? -1 : 1;
+      const below = tuft++ % 4 === 1;
+      const reach = spread * (0.65 + 0.35 * position);
+      const tipX = p.x + side * random(4, reach);
+      const tipY = p.y + (below ? 0.8 : -1) * random(7, reach * 0.85);
+
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.quadraticCurveTo(tipX, p.y + random(-2, 7), tipX, tipY);
+      ctx.strokeStyle = "#424943";
+      ctx.lineWidth = random(0.9, 1.9);
+      ctx.stroke();
+
+      const direction = below ? Math.PI / 2 : -Math.PI / 2;
+      drawNeedles(tipX, tipY, direction + random(-0.65, 0.65));
+      if (position > 0.4) {
+        drawNeedles((p.x + tipX) / 2, (p.y + tipY) / 2, direction);
+      }
+    }
+
+    const tip = path[last];
+    drawNeedles(tip.x, tip.y, -Math.PI / 2);
+  }
+
+  const trunk = samplePath([200, 590], [
+    [254, 527, 328, 489, 378, 517],
+    [433, 548, 471, 502, 455, 445],
+    [440, 399, 495, 386, 463, 345],
+    [436, 308, 415, 278, 461, 254],
+    [511, 225, 465, 186, 505, 151],
+    [523, 135, 527, 116, 516, 95]
+  ]);
+
+
+  const upperBranch = {
+    start: 119,
+    width: 7,
+    spread: 23,
+    curves: [
+      [521, 165, 559, 135, 581, 150],
+      [608, 169, 640, 168, 660, 151],
+      [676, 138, 672, 120, 693, 113]
+    ]
+  };
+
+  const offshoot = { at: 0.48, dx: 45, dy: -82, width: 4.8, spread: 18, bend: 12 };
+
+  function drawOffshoot(path, { at, dx, dy, width, spread, bend }) {
+    const root = path[Math.round(at * (path.length - 1))];
+    const endX = root.x + dx;
+    const endY = root.y + dy;
+    const shoot = samplePath([root.x, root.y], [[
+      root.x + dx * 0.25, root.y + dy * 0.46,
+      endX - dx * 0.52, endY + bend,
+      endX, endY
+    ]]);
+
+    drawWood(shoot, width, 0.9);
+    drawCrown(shoot, spread);
+  }
+
+
+  ctx.fillStyle = "#f3f0e8";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.lineCap = "round";
+  const root = trunk[upperBranch.start];
+  ctx.translate(canvas.width * 0.91, canvas.height * 0.76);
+  ctx.rotate(Math.PI / 9);
+  ctx.scale(-3.6, 3.6);
+  ctx.translate(-root.x, -root.y);
+  const path = samplePath([root.x, root.y], upperBranch.curves);
+
+  drawWood(trunk.slice(95), 19, 1.6);
+  drawWood(path, upperBranch.width, 1);
+  drawOffshoot(path, offshoot);
+  drawCrown(path, upperBranch.spread, offshoot.at);
+  for (const point of trunk.slice(-18).filter((_, i) => i % 3 === 0)) {
+    drawNeedles(point.x, point.y, -Math.PI / 2);
+  }
+  
+  }
+  function init_menu(document, { signal, search, navigate, requestAnimationFrame, cancelAnimationFrame }) {
+
+    const ctx = document.querySelector("#sprig").getContext("2d");
+    ctx.scale(2, 2);
+    ctx.lineCap = "round";
+    let seed = 58;
+
+    function range(min, max) {
+      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+      return min + (max - min) * seed / 0x100000000;
+    }
+
+    function curve(x, y, bendX, bendY, endX, endY, color, width) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(bendX, bendY, endX, endY);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
+    }
+
+    function needle(x, y, angle, length, color, width) {
+      const endX = x + Math.cos(angle) * length;
+      const endY = y + Math.sin(angle) * length;
+      curve(x, y, (x + endX) / 2 + 2, (y + endY) / 2 - 2,
+            endX, endY, color, width);
+    }
+
+    function drawStem(color, width) {
+      ctx.beginPath();
+      ctx.moveTo(72, 101);
+      ctx.quadraticCurveTo(162, 68, 284, 58);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
+    }
+
+    ctx.save();
+    ctx.translate(2, 5);
+    ctx.filter = "blur(3px)";
+    drawStem("#43483f40", 6);
+    ctx.restore();
+
+    drawStem("#57493a", 2.4);
+    curve(142, 79, 173, 68, 195, 52, "#625545", 1.15);
+    curve(188, 71, 217, 74, 242, 82, "#625545", 1.1);
+    curve(227, 66, 243, 53, 255, 46, "#625545", 0.9);
+
+    const inks = ["#39473b", "#56634f", "#687360", "#808271"];
+    for (const [x, y, direction, reach] of [
+      [153, 77, -1.99, 24], [186, 58, -1.35, 32], [199, 69, 0.75, 26],
+      [226, 77, 0.41, 26], [249, 52, -1.3, 29], [272, 60, -0.33, 31]
+    ]) {
+      for (let i = 0; i < 17; i++) {
+        const angle = direction + range(-0.68, 0.68);
+        needle(x + range(-9, 9), y + range(-3.5, 3.5), angle,
+               reach * range(0.47, 1), inks[Math.floor(range(0, inks.length))], range(0.5, 1.05));
+      }
+    }
+
+    for (const [x, y] of [[128, 108], [159, 99], [183, 116], [214, 110],
+                         [243, 100], [268, 114], [293, 91], [319, 104], [339, 118]]) {
+      const angle = range(-0.96, 0.84);
+      const length = range(9, 20);
+      ctx.save();
+      ctx.filter = "blur(0.8px)";
+      needle(x + 2, y + 2, angle, length, "#3e45354a", 1.15);
+      ctx.restore();
+      needle(x, y, angle, length, inks[Math.floor(range(0, inks.length))], 0.75);
+    }
+  
+  }
+  function init_movement(document, { signal, search, navigate, requestAnimationFrame, cancelAnimationFrame }) {
+
+    const duration = 10000;
+    const start = document.querySelector("#start");
+    const clock = document.querySelector("#clock");
+    const seconds = document.querySelector("#seconds");
+    const canvas = document.querySelector("#leaf");
+    const ctx = canvas.getContext("2d");
+    const still = matchMedia("(prefers-reduced-motion: reduce)");
+    let ink = [];
+
+    function formLeaf(lean, spread) {
+      ink = [];
+      function branch(x, y, angle, length, depth, revealAt) {
+        const endX = x + Math.cos(angle) * length;
+        const endY = y + Math.sin(angle) * length;
+        ink.push({ x, y, endX, endY, depth, revealAt });
+        if (depth === 0) return;
+        for (const side of [-1, 1]) {
+          branch(endX, endY, angle + side * spread, length * 0.52, depth - 1, revealAt + 0.095);
+        }
+      }
+
+      ctx.lineCap = "round";
+      const baseX = 244;
+      const baseY = 535;
+      for (let i = 0; i < 17; i++) {
+        const t = i / 17;
+        const next = (i + 1) / 17;
+        const x = baseX + lean * t * t;
+        const y = baseY - 455 * t;
+        ink.push({x, y, endX: baseX + lean * next * next, endY: baseY - 455 * next, depth: 4, revealAt: t * 0.83 });
+        if (i < 2) continue;
+        const length = 110 * Math.sin(Math.PI * t) ** 0.77;
+        for (const side of [-1, 1]) {
+          branch(x, y, -Math.PI / 2 + side * spread, length * (side === 1 ? 1 : 0.82), 2, t * 0.67 + 0.09);
+        }
+      }
+    }
+
+    function draw(progress) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(300, 370);
+      ctx.scale(1.1, 1.1);
+      ctx.translate(-300, -370);
+      for (const {x, y, endX, endY, depth, revealAt} of ink) {
+        const amount = Math.min(1, (progress - revealAt) / 0.07);
+        if (amount <= 0) continue;
+        ctx.strokeStyle = depth === 4 ? "#34463e" : depth === 2 ? "#4f6356" : "#747e69";
+        ctx.lineWidth = 1 + depth * 0.8;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + (endX - x) * amount, y + (endY - y) * amount);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    const status = document.querySelector("#sensor-status");
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+    async function allowSensor(EventType, absolute = false) {
+      if (!window.isSecureContext || !EventType) return false;
+      try {
+        if (typeof EventType.requestPermission === "function") {
+          return (await (absolute ? EventType.requestPermission(true) : EventType.requestPermission())) === "granted";
+        }
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    start.addEventListener("click", async () => {
+      if (start.disabled) return;
+      start.disabled = true;
+      clock.hidden = false;
+      seconds.textContent = "10";
+      status.hidden = false;
+      status.textContent = "Разрешите доступ к движению и ориентации телефона.";
+      // Оба запроса инициируются непосредственно касанием отпечатка.
+      const [motionAllowed, orientationAllowed] = await Promise.all([
+        allowSensor(window.DeviceMotionEvent),
+        allowSensor(window.DeviceOrientationEvent, true)
+      ]);
+      if (signal.aborted) return;
+      status.textContent = motionAllowed || orientationAllowed
+        ? "Плавно наклоняйте и поворачивайте телефон."
+        : "Датчики недоступны. Рисунок всё равно появится.";
+      formLeaf(34 + Math.random() * 66, 0.81 + Math.random() * 0.31);
+      draw(still.matches ? 1 : 0);
+
+      let acceleration = 0, accelerationCount = 0;
+      let previousGravity, compassX = 0, compassY = 0;
+      let tilt = 0, tiltCount = 0;
+      let lastStrongSample = -Infinity, facesLeft = false;
+
+      function recordAcceleration(magnitude) {
+        acceleration += Math.min(12, magnitude);
+        accelerationCount++;
+        if (magnitude < 7) return;
+        const now = performance.now();
+        if (now - lastStrongSample < 450) facesLeft = true;
+        lastStrongSample = now;
+      }
+      let hasRelativeOrientation = false;
+      function motion(event) {
+        const linear = event.acceleration;
+        if (linear && [linear.x, linear.y, linear.z].every(Number.isFinite)) {
+          recordAcceleration(Math.hypot(linear.x, linear.y, linear.z));
+        } else {
+          const gravity = event.accelerationIncludingGravity;
+          if (gravity && [gravity.x, gravity.y, gravity.z].every(Number.isFinite)) {
+            const magnitude = Math.hypot(gravity.x, gravity.y, gravity.z);
+            if (previousGravity !== undefined) {
+              recordAcceleration(Math.abs(magnitude - previousGravity));
+            }
+            previousGravity = magnitude;
+          }
+        }
+      }
+
+      function orientation(event) {
+        const absoluteEvent = event.type === "deviceorientationabsolute";
+        if (!absoluteEvent && Number.isFinite(event.gamma)) {
+          hasRelativeOrientation = true;
+        }
+        if ((!absoluteEvent || !hasRelativeOrientation) && Number.isFinite(event.gamma)) {
+          tilt += clamp(event.gamma, -40, 40);
+          tiltCount++;
+        }
+        const heading = Number.isFinite(event.webkitCompassHeading) && event.webkitCompassHeading >= 0
+          ? event.webkitCompassHeading
+          : (event.absolute || event.type === "deviceorientationabsolute") && Number.isFinite(event.alpha)
+            ? 360 - event.alpha : null;
+        if (heading !== null) {
+          compassX += Math.cos(heading * Math.PI / 180);
+          compassY += Math.sin(heading * Math.PI / 180);
+        }
+      }
+      if (motionAllowed) window.addEventListener("devicemotion", motion, { signal });
+      if (orientationAllowed) {
+        window.addEventListener("deviceorientation", orientation, { signal });
+        window.addEventListener("deviceorientationabsolute", orientation, { signal });
+      }
+
+      const began = performance.now();
+      function frame(now) {
+        const elapsed = Math.max(0, now - began);
+        const remaining = Math.max(0, Math.ceil((duration - elapsed) / 1000));
+        if (seconds.textContent !== String(remaining)) seconds.textContent = String(remaining);
+        if (!still.matches || elapsed >= duration) draw(Math.min(1, elapsed / duration));
+        if (elapsed < duration) {
+          requestAnimationFrame(frame);
+          return;
+        }
+        window.removeEventListener("devicemotion", motion);
+        window.removeEventListener("deviceorientation", orientation);
+        window.removeEventListener("deviceorientationabsolute", orientation);
+        const params = new URLSearchParams({
+          run: "1",
+          seed: String(Math.floor(Math.random() * 0x100000000)),
+          scale: (accelerationCount ? 0.85 + clamp(acceleration / accelerationCount / 4, 0, 1) * 0.30 : 1).toFixed(4),
+          bend: (tiltCount ? tilt / tiltCount / 40 : 0).toFixed(4),
+          north: (Math.hypot(compassX, compassY) > 0.01 ? (1 + Math.cos(Math.atan2(compassY, compassX))) / 2 : 0.5).toFixed(4),
+          left: facesLeft ? "1" : "0"
+        });
+        navigate("landscape", params);
+      }
+      requestAnimationFrame(frame);
+    });
+
+  }
+  function init_thoughts(document, { signal, search, navigate, requestAnimationFrame, cancelAnimationFrame }) {
+
+    const ctx = document.querySelector("#sprig").getContext("2d");
+    ctx.scale(2, 2);
+    ctx.lineCap = "round";
+    let seed = 58;
+
+    function range(min, max) {
+      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+      return min + (max - min) * seed / 0x100000000;
+    }
+
+    function curve(x, y, bendX, bendY, endX, endY, color, width) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(bendX, bendY, endX, endY);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
+    }
+
+    function needle(x, y, angle, length, color, width) {
+      const endX = x + Math.cos(angle) * length;
+      const endY = y + Math.sin(angle) * length;
+      curve(x, y, (x + endX) / 2 + 2, (y + endY) / 2 - 2,
+            endX, endY, color, width);
+    }
+
+    function drawStem(color, width) {
+      ctx.beginPath();
+      ctx.moveTo(72, 101);
+      ctx.quadraticCurveTo(162, 68, 284, 58);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
+    }
+
+    ctx.save();
+    ctx.translate(2, 5);
+    ctx.filter = "blur(3px)";
+    drawStem("#43483f40", 6);
+    ctx.restore();
+
+    drawStem("#57493a", 2.4);
+    curve(142, 79, 173, 68, 195, 52, "#625545", 1.15);
+    curve(188, 71, 217, 74, 242, 82, "#625545", 1.1);
+    curve(227, 66, 243, 53, 255, 46, "#625545", 0.9);
+
+    const inks = ["#39473b", "#56634f", "#687360", "#808271"];
+    for (const [x, y, direction, reach] of [
+      [153, 77, -1.99, 24], [186, 58, -1.35, 32], [199, 69, 0.75, 26],
+      [226, 77, 0.41, 26], [249, 52, -1.3, 29], [272, 60, -0.33, 31]
+    ]) {
+      for (let i = 0; i < 17; i++) {
+        const angle = direction + range(-0.68, 0.68);
+        needle(x + range(-9, 9), y + range(-3.5, 3.5), angle,
+               reach * range(0.47, 1), inks[Math.floor(range(0, inks.length))], range(0.5, 1.05));
+      }
+    }
+
+    for (const [x, y] of [[128, 108], [159, 99], [183, 116], [214, 110],
+                         [243, 100], [268, 114], [293, 91], [319, 104], [339, 118]]) {
+      const angle = range(-0.96, 0.84);
+      const length = range(9, 20);
+      ctx.save();
+      ctx.filter = "blur(0.8px)";
+      needle(x + 2, y + 2, angle, length, "#3e45354a", 1.15);
+      ctx.restore();
+      needle(x, y, angle, length, inks[Math.floor(range(0, inks.length))], 0.75);
+    }
+  
+  }
+  function init_landscape(document, { signal, search, navigate, requestAnimationFrame, cancelAnimationFrame }) {
+
+  const canvas = document.querySelector("#tree");
+  const ctx = canvas.getContext("2d");
+
+  const query = new URLSearchParams(search);
+  const result = query.get("run") === "1";
+  if (result) canvas.parentElement.classList.add("is-result");
+  function parameter(name, fallback, min, max) {
+    const raw = query.get(name);
+    const value = raw === null || raw === "" ? NaN : Number(raw);
+    return result && Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
+  }
+  const art = {
+    seed: parameter("seed", 37, 0, 0xffffffff),
+    scale: parameter("scale", 1, 0.85, 1.15),
+    bend: parameter("bend", 0, -1, 1),
+    north: parameter("north", 0.5, 0, 1),
+    facesLeft: !result || query.get("left") === "1"
+  };
+
+  // Ветви отражаются относительно точек крепления на стволе.
+  // Правый силуэт чуть уже, чтобы поместиться у края картины.
+  const branchDirection = art.facesLeft ? 1 : -0.76;
+
+  function faceBranch(root, curves) {
+    return curves.map(curve => curve.map((coordinate, index) =>
+      index % 2 === 0 ? root.x + (coordinate - root.x) * branchDirection : coordinate
+    ));
+  }
+
+  function bendPoint({ x, y }) {
+    const rise = (590 - y) / 500;
+    return { x: x - art.bend * 75 * rise * rise, y };
+  }
+
+  function bendPath(path) {
+    if (art.bend === 0) return path;
+    return path.map(point => {
+      const { x, y } = bendPoint(point);
+      const dx = Math.cos(point.angle) + art.bend * 150 * (590 - y) / 250000 * Math.sin(point.angle);
+      const angle = Math.atan2(Math.sin(point.angle), dx);
+      return { x, y, angle, nx: -Math.sin(angle), ny: Math.cos(angle) };
+    });
+  }
+
+  // Фиксированное зерно сохраняет рисунок при перезагрузке.
+  let seed = 37;
+  function random(min, max) {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return min + (max - min) * seed / 4294967296;
+  }
+
+  function stroke(x, y, endX, endY, color, width) {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(endX, endY);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.stroke();
+  }
+
+  // В каждой строке две контрольные точки и конец кривой Безье.
+  function samplePath(start, curves) {
+    const points = [{ x: start[0], y: start[1] }];
+    let [x, y] = start;
+
+    for (const [ax, ay, bx, by, endX, endY] of curves) {
+      for (let step = 1; step <= 24; step++) {
+        const t = step / 24;
+        const s = 1 - t;
+        points.push({
+          x: s ** 3 * x + 3 * s ** 2 * t * ax
+            + 3 * s * t ** 2 * bx + t ** 3 * endX,
+          y: s ** 3 * y + 3 * s ** 2 * t * ay
+            + 3 * s * t ** 2 * by + t ** 3 * endY
+        });
+      }
+      x = endX;
+      y = endY;
+    }
+
+    return points.map((point, i) => {
+      const before = points[Math.max(0, i - 1)];
+      const after = points[Math.min(points.length - 1, i + 1)];
+      const angle = Math.atan2(after.y - before.y, after.x - before.x);
+      return { ...point, angle, nx: -Math.sin(angle), ny: Math.cos(angle) };
+    });
+  }
+
+  function drawWood(path, baseWidth, tipWidth) {
+    const last = path.length - 1;
+    const halfWidths = path.map((_, i) =>
+      (tipWidth + (baseWidth - tipWidth) * (1 - i / last) ** 1.2) / 2
+    );
+
+    function edge(point, i, side) {
+      const distance = side * halfWidths[i] * random(0.83, 1.16);
+      return [point.x + point.nx * distance, point.y + point.ny * distance];
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(...edge(path[0], 0, 1));
+    for (let i = 1; i <= last; i++) ctx.lineTo(...edge(path[i], i, 1));
+    for (let i = last; i >= 0; i--) ctx.lineTo(...edge(path[i], i, -1));
+    ctx.closePath();
+    ctx.fillStyle = "#373a37";
+    ctx.fill();
+
+    // Обрезка удерживает штрихи внутри силуэта коры.
+    ctx.save();
+    ctx.clip();
+
+    const barkColors = ["#181e1b", "#515650", "#777b74", "#a5a79e"];
+    for (let i = 0; i < last; i++) {
+      const p = path[i];
+      const q = path[Math.min(last, i + Math.floor(random(1, 5)))];
+
+      for (let j = 0; j < 5; j++) {
+        const offset = random(-1, 1) * halfWidths[i];
+        const endOffset = offset + random(-2, 2);
+        stroke(
+          p.x + p.nx * offset, p.y + p.ny * offset,
+          q.x + q.nx * endOffset, q.y + q.ny * endOffset,
+          barkColors[Math.floor(random(0, barkColors.length))],
+          random(0.5, 1.9)
+        );
+      }
+    }
+
+    ctx.restore();
+  }
+
+  const greens = ["#14201c", "#303b35", "#4d5550", "#777d76"];
+
+  function drawNeedles(x, y, direction) {
+    for (let i = 0; i < 34; i++) {
+      const baseX = x + random(-18, 18);
+      const baseY = y + random(-4, 4);
+      const angle = direction + random(-0.7, 0.7);
+      const length = random(4, 10);
+      stroke(
+        baseX, baseY,
+        baseX + Math.cos(angle) * length, baseY + Math.sin(angle) * length,
+        greens[Math.floor(random(0, greens.length))], random(0.6, 1.8)
+      );
+    }
+  }
+
+  function drawCrown(path, spread, forkAt = null) {
+    const last = path.length - 1;
+
+    // Редкие пучки у основания, более густые к концам.
+    let tuft = 0;
+    for (let i = Math.ceil(last * 0.18); i <= last; i += i < last * 0.45 ? 4 : 3) {
+      const position = i / last;
+      if (forkAt !== null && Math.abs(position - forkAt) < 0.09) continue;
+
+      const p = path[i];
+      const side = Math.cos(p.angle) < 0 ? -1 : 1;
+      const below = tuft++ % 4 === 1;
+      const reach = spread * (0.65 + 0.35 * position);
+      const tipX = p.x + side * random(4, reach);
+      const tipY = p.y + (below ? 0.8 : -1) * random(7, reach * 0.85);
+
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.quadraticCurveTo(tipX, p.y + random(-2, 7), tipX, tipY);
+      ctx.strokeStyle = "#424943";
+      ctx.lineWidth = random(0.9, 1.9);
+      ctx.stroke();
+
+      const direction = below ? Math.PI / 2 : -Math.PI / 2;
+      drawNeedles(tipX, tipY, direction + random(-0.65, 0.65));
+      if (position > 0.4) {
+        drawNeedles((p.x + tipX) / 2, (p.y + tipY) / 2, direction);
+      }
+    }
+
+    const tip = path[last];
+    drawNeedles(tip.x, tip.y, -Math.PI / 2);
+  }
+
+  const landscape = {
+    layers: [2, 3],
+    blur: [4, 8],
+    peakHeight: [95, 210],
+    ridgeCount: [8, 12],
+    fractalSteps: [2, 4],
+    displacement: [15, 32],
+    persistence: [0.47, 0.59]
+  };
+
+  function fractalRidge(anchors, base, peak, depth) {
+    const [minSteps, maxSteps] = landscape.fractalSteps;
+    const steps = Math.round(minSteps + (maxSteps - minSteps) * depth);
+    const persistence = random(...landscape.persistence);
+    let amplitude = random(...landscape.displacement) * (0.72 + depth * 0.28)
+      * (result ? 0.40 + 1.20 * art.north : 1);
+    let points = anchors;
+
+    // На каждом проходе добавляем вершины между существующими точками.
+    for (let step = 0; step < steps; step++) {
+      const refined = [];
+      for (let i = 1; i < points.length; i++) {
+        const left = points[i - 1];
+        const right = points[i];
+        const t = random(0.35, 0.65);
+        const y = left.y + (right.y - left.y) * t;
+        const relief = Math.max(0, Math.min(1, (base - y) / peak));
+        refined.push(left, {
+          x: left.x + (right.x - left.x) * t,
+          y: y + random(-amplitude, amplitude) * (0.24 + relief * 0.76)
+        });
+      }
+      refined.push(points[points.length - 1]);
+      points = refined;
+      amplitude *= persistence;
+    }
+
+    return points;
+  }
+
+  function drawMountains() {
+    const width = 820;
+    const height = 850;
+    ctx.fillStyle = "#f3f0e8";
+    ctx.fillRect(0, 0, width, height);
+    const count = Math.floor(random(landscape.layers[0], landscape.layers[1] + 1));
+
+    for (let layer = 0; layer < count; layer++) {
+      const depth = layer / (count - 1);
+      const base = height * (0.44 + depth * 0.24) + random(-32, 24);
+      const peak = random(...landscape.peakHeight) * (result ? 0.70 + 0.60 * art.north : 1);
+      const focus = width * (layer % 2 === 0 ? random(0.59, 0.88) : random(0.11, 0.34));
+      const countPoints = Math.floor(random(...landscape.ridgeCount));
+      const anchors = [];
+
+      for (let i = 0; i <= countPoints; i++) {
+        const x = -50 + (width + 100) * i / countPoints + random(-14, 14);
+        const mass = Math.exp(-(((x - focus) / (width * 0.25)) ** 2));
+        const y = base - peak * mass * random(0.58, 1.16) - random(0, 32);
+        anchors.push({ x, y });
+      }
+
+      const points = fractalRidge(anchors, base, peak, depth);
+      const smoothing = result ? (1 - art.north) * 0.42 : 0;
+      for (let i = 1; i < points.length - 1 && smoothing > 0; i++) {
+        const point = points[i];
+        point.y += ((points[i - 1].y + points[i + 1].y) / 2 - point.y) * smoothing;
+      }
+
+      function traceRidge() {
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (const { x, y } of points.slice(1)) ctx.lineTo(x, y);
+      }
+
+      const crest = Math.min(...points.map(point => point.y));
+      ctx.save();
+      const blur = random(...landscape.blur) * (0.82 - depth * 0.42);
+      ctx.filter = `blur(${blur}px)`;
+      const wash = ctx.createLinearGradient(0, crest, 0, base + 35);
+      wash.addColorStop(0, `rgba(41, 47, 43, ${0.24 + depth * 0.25})`);
+      wash.addColorStop(0.36, `rgba(65, 71, 66, ${0.15 + depth * 0.20})`);
+      wash.addColorStop(0.76, `rgba(96, 100, 92, ${0.04 + depth * 0.07})`);
+      wash.addColorStop(1, "rgba(107, 111, 103, 0)");
+      ctx.fillStyle = wash;
+      traceRidge();
+      ctx.lineTo(width + 60, base + 43);
+      ctx.lineTo(-60, base + 43);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // На выступах больше туши, в седловинах кайма растворяется.
+      const firstX = points[0].x;
+      const lastX = points[points.length - 1].x;
+      const rim = ctx.createLinearGradient(firstX, 0, lastX, 0);
+      for (const { x, y } of points) {
+        const elevation = Math.max(0, Math.min(1, (base - y) / (base - crest)));
+        const opacity = 0.015 + elevation ** 2 * (0.34 + depth * 0.27);
+        rim.addColorStop((x - firstX) / (lastX - firstX), `rgba(39, 44, 40, ${opacity})`);
+      }
+
+      ctx.save();
+      traceRidge();
+      ctx.strokeStyle = rim;
+      ctx.lineJoin = "round";
+      ctx.filter = `blur(${3.1 - depth * 1.25}px)`;
+      ctx.lineWidth = 5.5 + depth * 3;
+      ctx.stroke();
+      ctx.filter = `blur(${0.95 - depth * 0.42}px)`;
+      ctx.lineWidth = 0.8 + depth * 0.65;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function drawRock() {
+    // Растушёвка стирает только нижний край скалы на отдельном слое.
+    const layer = document.createElement("canvas");
+    layer.width = 365;
+    layer.height = 168;
+    const ink = layer.getContext("2d");
+    ink.translate(130, 29);
+
+    function trace(points) {
+      ink.beginPath();
+      ink.moveTo(...points[0]);
+      for (const point of points.slice(1)) ink.lineTo(...point);
+    }
+
+    const washes = [
+      ["rgba(43, 49, 44, 0.42)", [[-103, 119], [-74, 54], [-35, 16],
+        [1, -4], [36, -18], [56, -8], [72, -10], [92, 5],
+        [113, 0], [136, 19], [173, 13], [198, 32], [207, 124]]],
+      ["rgba(35, 40, 36, 0.53)", [[-80, 111], [-53, 59], [-9, 24],
+        [36, 4], [62, -4], [43, 26], [8, 49], [-17, 93], [-33, 123]]],
+      ["rgba(39, 45, 40, 0.46)", [[7, 126], [30, 79], [54, 53],
+        [80, 27], [100, 29], [113, 10], [146, 32], [173, 22],
+        [204, 40], [209, 124], [104, 107], [53, 129]]],
+      ["rgba(96, 98, 87, 0.34)", [[-65, 80], [-38, 41], [-4, 20],
+        [36, -12], [51, 2], [18, 20], [-12, 50], [-26, 76]]]
+    ];
+
+    for (const [color, points] of washes) {
+      ink.filter = "blur(4px)";
+      trace(points);
+      ink.fillStyle = color;
+      ink.fill();
+    }
+
+    ink.filter = "none";
+    ink.lineCap = "round";
+    ink.lineJoin = "bevel";
+    const contours = [
+      [3.3, [[-79, 62], [-63, 45], [-59, 37], [-30, 14], [-10, 0],
+        [12, -8], [19, -9], [37, -18], [56, -8], [72, -10], [92, 5], [113, 0]]],
+      [1.6, [[115, 1], [136, 19], [173, 13], [198, 32]]],
+      [2.2, [[92, 5], [83, 32], [69, 52], [64, 79]]],
+      [1.7, [[136, 19], [120, 35], [123, 51], [100, 77], [97, 98]]],
+      [1.4, [[160, 26], [148, 52], [130, 72], [137, 89]]],
+      [2.5, [[-49, 57], [-30, 44], [-21, 29], [1, 22], [23, 7], [34, 3]]],
+      [1.1, [[-30, 62], [-15, 48], [2, 42], [17, 30], [35, 22], [45, 10]]],
+      [2.1, [[15, 76], [31, 59], [46, 54], [65, 37]]],
+      [1.3, [[60, 68], [77, 59], [92, 64], [103, 76]]],
+      [0.8, [[-68, 78], [-77, 90], [-81, 104]]],
+      [0.9, [[101, 82], [118, 92], [123, 101]]]
+    ];
+
+    for (const [width, points] of contours) {
+      trace(points);
+      ink.strokeStyle = "rgba(31, 35, 31, 0.37)";
+      ink.lineWidth = width * 0.56;
+      ink.setLineDash([width * 3, width * 1.7, width * 6.5, width * 2.1]);
+      ink.stroke();
+    }
+
+    // Неровные сухие мазки поверх размытого пятна.
+    ink.setLineDash([]);
+    let grain = 923;
+    function rockJitter() {
+      grain = (Math.imul(grain, 1664525) + 1013904223) >>> 0;
+      return grain / 0x100000000;
+    }
+    for (const [, points] of contours) {
+      for (let i = 1; i < points.length; i++) {
+        const [ax, ay] = points[i - 1];
+        const [bx, by] = points[i];
+        for (let j = 0; j < 12; j++) {
+          const t = rockJitter();
+          const x = ax + (bx - ax) * t + (rockJitter() - 0.5) * 6;
+          const y = ay + (by - ay) * t + (rockJitter() - 0.5) * 7;
+          ink.beginPath();
+          ink.moveTo(x, y);
+          ink.lineTo(x + (bx - ax) * 0.17, y + (by - ay) * 0.17);
+          ink.strokeStyle = `rgba(33, 38, 34, ${rockJitter() * 0.43})`;
+          ink.lineWidth = 0.35 + rockJitter() * 1.15;
+          ink.stroke();
+        }
+      }
+    }
+
+    const fade = ink.createLinearGradient(0, 58, 0, 123);
+    fade.addColorStop(0, "rgba(0, 0, 0, 0)");
+    fade.addColorStop(0.55, "rgba(0, 0, 0, 0.72)");
+    fade.addColorStop(1, "rgba(0, 0, 0, 1)");
+    ink.globalCompositeOperation = "destination-out";
+    ink.fillStyle = fade;
+    ink.fillRect(-130, 58, layer.width, layer.height - 58);
+
+    ctx.drawImage(layer, 505, 704);
+  }
+
+  const trunk = samplePath([200, 590], [
+    [254, 527, 328, 489, 378, 517],
+    [433, 548, 471, 502, 455, 445],
+    [440, 399, 495, 386, 463, 345],
+    [436, 308, 415, 278, 461, 254],
+    [511, 225, 465, 186, 505, 151],
+    [523, 135, 527, 116, 516, 95]
+  ]);
+
+  // Все четыре ветви начинаются на изгибах ствола.
+  const branches = [
+    {
+      start: 42, width: 25, spread: 46,
+      curves: [
+        [505, 477, 561, 403, 611, 443],
+        [666, 487, 715, 495, 762, 469],
+        [792, 453, 812, 452, 838, 459]
+      ]
+    },
+    {
+      start: 69, width: 17, spread: 30,
+      curves: [
+        [510, 359, 559, 308, 610, 326],
+        [653, 345, 686, 365, 728, 342],
+        [749, 331, 764, 313, 791, 319]
+      ]
+    },
+    {
+      start: 96, width: 18, spread: 31,
+      curves: [
+        [424, 272, 390, 235, 367, 208],
+        [343, 179, 309, 200, 274, 212],
+        [250, 220, 224, 214, 207, 188]
+      ]
+    },
+    {
+      start: 119, width: 7, spread: 23,
+      curves: [
+        [521, 165, 559, 135, 581, 150],
+        [608, 169, 640, 168, 660, 151],
+        [676, 138, 672, 120, 693, 113]
+      ]
+    }
+  ];
+
+  const offshoots = {
+    // Вторая ветвь опускается вниз, четвёртая круче загибается вверх.
+    2: { at: 0.37, dx: 83, dy: 77, width: 7, spread: 23, bend: -16 },
+    4: { at: 0.48, dx: 45, dy: -82, width: 4.8, spread: 18, bend: 12 }
+  };
+
+  function drawOffshoot(path, { at, dx, dy, width, spread, bend }) {
+    dx *= branchDirection;
+    const root = path[Math.round(at * (path.length - 1))];
+    const endX = root.x + dx;
+    const endY = root.y + dy;
+    const shoot = samplePath([root.x, root.y], [[
+      root.x + dx * 0.25, root.y + dy * 0.46,
+      endX - dx * 0.52, endY + bend,
+      endX, endY
+    ]]);
+
+    const bent = bendPath(shoot);
+    drawWood(bent, width, 0.9);
+    drawCrown(bent, spread);
+  }
+
+  const frameStyles = [
+    { outer: "#596258", inner: "#8b7160", inset: 13, gap: 5, marks: [
+      [[0, 30], [8, 30], [8, 19], [19, 19], [19, 8], [30, 8], [30, 0]]
+    ] },
+    { outer: "#686356", inner: "#a39a7e", inset: 11, gap: 8, marks: [
+      [[0, 37], [12, 37], [12, 12], [37, 12], [37, 0]],
+      [[5, 30], [5, 5], [30, 5]]
+    ] },
+    { outer: "#687568", inner: "#9b9e87", inset: 15, gap: 4, marks: [
+      [[4, 33], [16, 21], [4, 9]],
+      [[9, 4], [21, 16], [33, 4]],
+      [[14, 14], [21, 7], [28, 14], [21, 21], [14, 14]]
+    ] },
+    { outer: "#85695c", inner: "#b2a393", inset: 12, gap: 6, marks: [
+      [[6, 34], [6, 6], [34, 6]],
+      [[13, 28], [13, 13], [28, 13]],
+      [[20, 22], [20, 20], [22, 20]]
+    ] },
+    { outer: "#4e5f57", inner: "#8d8370", inset: 17, gap: 7, marks: [
+      [[0, 26], [10, 26], [10, 10], [26, 10], [26, 0]],
+      [[8, 36], [16, 36], [16, 16], [36, 16], [36, 8]],
+      [[20, 28], [28, 28], [28, 20]]
+    ] }
+  ];
+
+  const calendarZone = "Europe/Moscow";
+  const koreanDay = new Intl.DateTimeFormat("ko-KR", { weekday: "long", timeZone: calendarZone });
+  const russianDay = new Intl.DateTimeFormat("ru-RU", { weekday: "long", timeZone: calendarZone });
+  const calendarDate = new Intl.DateTimeFormat("ko-KR", {
+    day: "numeric", month: "long", year: "numeric", timeZone: calendarZone
+  });
+  const lunarFormatter = new Intl.DateTimeFormat("ko-KR-u-ca-dangi", {
+    month: "long", day: "numeric", timeZone: calendarZone
+  });
+
+  // Фазы USNO в UTC. Первая запись — первая четверть.
+  // https://aa.usno.navy.mil/data/MoonPhases
+  const moonQuarters = `
+    2025-12-27T19:10Z 2026-01-03T10:03Z 2026-01-10T15:48Z 2026-01-18T19:52Z
+    2026-01-26T04:47Z 2026-02-01T22:09Z 2026-02-09T12:43Z 2026-02-17T12:01Z
+    2026-02-24T12:27Z 2026-03-03T11:38Z 2026-03-11T09:38Z 2026-03-19T01:23Z
+    2026-03-25T19:18Z 2026-04-02T02:12Z 2026-04-10T04:51Z 2026-04-17T11:52Z
+    2026-04-24T02:32Z 2026-05-01T17:23Z 2026-05-09T21:10Z 2026-05-16T20:01Z
+    2026-05-23T11:11Z 2026-05-31T08:45Z 2026-06-08T10:00Z 2026-06-15T02:54Z
+    2026-06-21T21:55Z 2026-06-29T23:56Z 2026-07-07T19:29Z 2026-07-14T09:43Z
+    2026-07-21T11:05Z 2026-07-29T14:36Z 2026-08-06T02:21Z 2026-08-12T17:37Z
+    2026-08-20T02:46Z 2026-08-28T04:18Z 2026-09-04T07:51Z 2026-09-11T03:27Z
+    2026-09-18T20:44Z 2026-09-26T16:49Z 2026-10-03T13:25Z 2026-10-10T15:50Z
+    2026-10-18T16:12Z 2026-10-26T04:12Z 2026-11-01T20:28Z 2026-11-09T07:02Z
+    2026-11-17T11:48Z 2026-11-24T14:53Z 2026-12-01T06:08Z 2026-12-09T00:52Z
+    2026-12-17T05:42Z 2026-12-24T01:28Z 2026-12-30T18:59Z 2027-01-07T20:24Z
+    2027-01-15T20:34Z 2027-01-22T12:17Z 2027-01-29T10:55Z 2027-02-06T15:56Z
+    2027-02-14T07:58Z 2027-02-20T23:23Z 2027-02-28T05:16Z 2027-03-08T09:29Z
+    2027-03-15T16:25Z 2027-03-22T10:44Z 2027-03-30T00:54Z 2027-04-06T23:51Z
+    2027-04-13T22:56Z 2027-04-20T22:27Z 2027-04-28T20:18Z 2027-05-06T10:58Z
+    2027-05-13T04:44Z 2027-05-20T10:59Z 2027-05-28T13:58Z 2027-06-04T19:40Z
+    2027-06-11T10:56Z 2027-06-19T00:44Z 2027-06-27T04:54Z 2027-07-04T03:02Z
+    2027-07-10T18:39Z 2027-07-18T15:45Z 2027-07-26T16:55Z 2027-08-02T10:05Z
+    2027-08-09T04:54Z 2027-08-17T07:29Z 2027-08-25T02:27Z 2027-08-31T17:41Z
+    2027-09-07T18:31Z 2027-09-15T23:03Z 2027-09-23T10:20Z 2027-09-30T02:36Z
+    2027-10-07T11:47Z 2027-10-15T13:47Z 2027-10-22T17:29Z 2027-10-29T13:36Z
+    2027-11-06T08:00Z 2027-11-14T03:26Z 2027-11-21T00:48Z 2027-11-28T03:24Z
+    2027-12-06T05:22Z 2027-12-13T16:09Z 2027-12-20T09:11Z 2027-12-27T20:12Z
+    2028-01-05T01:40Z 2028-01-12T04:03Z 2028-01-18T19:26Z 2028-01-26T15:12Z
+    2028-02-03T19:10Z 2028-02-10T15:04Z 2028-02-17T08:08Z 2028-02-25T10:37Z
+    2028-03-04T09:02Z 2028-03-11T01:06Z 2028-03-17T23:23Z 2028-03-26T04:31Z
+    2028-04-02T19:15Z 2028-04-09T10:26Z 2028-04-16T16:37Z 2028-04-24T19:47Z
+    2028-05-02T02:26Z 2028-05-08T19:49Z 2028-05-16T10:43Z 2028-05-24T08:16Z
+    2028-05-31T07:36Z 2028-06-07T06:09Z 2028-06-15T04:27Z 2028-06-22T18:27Z
+    2028-06-29T12:10Z 2028-07-06T18:11Z 2028-07-14T20:56Z 2028-07-22T03:02Z
+    2028-07-28T17:40Z 2028-08-05T08:10Z 2028-08-13T11:45Z 2028-08-20T10:44Z
+    2028-08-27T01:36Z 2028-09-03T23:47Z 2028-09-12T00:46Z 2028-09-18T18:24Z
+    2028-09-25T13:10Z 2028-10-03T16:25Z 2028-10-11T11:57Z 2028-10-18T02:57Z
+    2028-10-25T04:53Z 2028-11-02T09:17Z 2028-11-09T21:26Z 2028-11-16T13:18Z
+    2028-11-24T00:14Z 2028-12-02T01:40Z 2028-12-09T05:39Z 2028-12-16T02:06Z
+    2028-12-23T21:45Z 2028-12-31T16:48Z
+  `.trim().split(/\s+/).map(value => Date.parse(value));
+
+  let dateOfArtwork, lunarLabel, moonAngle;
+
+  function moonPhaseAngle(date) {
+    const time = date.getTime();
+    const index = moonQuarters.findIndex(quarter => quarter > time) - 1;
+    if (index < 0) return null;
+    const start = moonQuarters[index];
+    const fraction = (time - start) / (moonQuarters[index + 1] - start);
+    return ((index + 1 + fraction) % 4) * Math.PI / 2;
+  }
+
+  function drawMoon(x, y, phase) {
+    const radius = 6;
+    const side = phase < Math.PI ? 1 : -1;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = "#5e675c";
+    ctx.beginPath();
+    ctx.moveTo(0, -radius);
+    for (let i = 1; i <= 16; i++) {
+      const angle = Math.PI * i / 16;
+      ctx.lineTo(side * radius * Math.sin(angle), -radius * Math.cos(angle));
+    }
+    for (let i = 15; i >= 0; i--) {
+      const angle = Math.PI * i / 16;
+      ctx.lineTo(side * radius * Math.sin(angle) * Math.cos(phase), -radius * Math.cos(angle));
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = "#5e675c80";
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawCalendar(inset) {
+    const ornamentClearance = inset + 45;
+    ctx.save();
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillStyle = "#303b35";
+    ctx.font = '600 35px "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif';
+    ctx.fillText(koreanDay.format(dateOfArtwork), ornamentClearance, inset + 44);
+
+    ctx.font = "17px system-ui, sans-serif";
+    ctx.fillStyle = "#596257";
+    ctx.shadowColor = "#39453c60";
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 3;
+    ctx.shadowBlur = 5;
+    ctx.fillText(russianDay.format(dateOfArtwork), ornamentClearance, inset + 90);
+
+    ctx.shadowColor = "transparent";
+    ctx.font = '15px "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif';
+    ctx.fillStyle = "#4b554e";
+    ctx.textBaseline = "bottom";
+    const bottom = canvas.height - inset - 27;
+    ctx.fillText(calendarDate.format(dateOfArtwork), ornamentClearance, bottom - (lunarLabel ? 22 : 0));
+    if (lunarLabel) {
+      ctx.font = '12px "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif';
+      ctx.fillStyle = "#60695f";
+      if (moonAngle !== null) drawMoon(ornamentClearance + 6, bottom - 7, moonAngle);
+      ctx.fillText(lunarLabel, ornamentClearance + (moonAngle === null ? 0 : 20), bottom);
+    }
+    ctx.restore();
+  }
+
+  function drawFrame() {
+    const { width, height } = canvas;
+    const index = (Math.imul(art.seed, 0x9e3779b1) >>> 0) % frameStyles.length;
+    const { outer, inner, inset, gap, marks } = frameStyles[index];
+    ctx.save();
+    ctx.strokeStyle = outer;
+    ctx.lineWidth = 1.4;
+    ctx.strokeRect(inset, inset, width - inset * 2, height - inset * 2);
+    const inside = inset + gap;
+    ctx.strokeStyle = inner;
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(inside, inside, width - inside * 2, height - inside * 2);
+
+    for (const sx of [-1, 1]) {
+      for (const sy of [-1, 1]) {
+        ctx.save();
+        ctx.translate(sx === 1 ? inset : width - inset, sy === 1 ? inset : height - inset);
+        ctx.scale(sx, sy);
+        for (const [index, [start, ...points]] of marks.entries()) {
+          ctx.beginPath();
+          ctx.moveTo(...start);
+          for (const point of points) ctx.lineTo(...point);
+          ctx.strokeStyle = index % 2 === 0 ? outer : inner;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+    ctx.restore();
+    drawCalendar(inset);
+  }
+
+  const ribbonColors = [
+    ["#325c99", "#8faedd"], ["#a8353d", "#e78581"],
+    ["#397350", "#93bb8b"], ["#b28622", "#ead276"],
+    ["#b95f26", "#e9a371"], ["#ad577f", "#e5a0be"],
+    ["#715492", "#bda5d9"]
+  ];
+  const backdrop = document.createElement("canvas");
+  backdrop.width = canvas.width;
+  backdrop.height = canvas.height;
+  const backdropCtx = backdrop.getContext("2d");
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  let ribbonFrame, ribbonSeed, ribbonAnchor, ribbonStarted;
+
+  function positionForeground() {
+    ctx.translate(43, 23);
+  }
+
+  function positionTree() {
+    ctx.translate(790, 310);
+    ctx.scale(-0.74, 0.74);
+    ctx.translate(200, 590);
+    ctx.scale(art.scale, art.scale);
+    ctx.translate(-200, -590);
+  }
+
+  function drawRockNotch() {
+    ctx.save();
+    positionForeground();
+    ctx.translate(642, 746);
+    for (const [color, points] of [
+      ["#50544b", [[-27, 21], [-21, 1], [-13, -9], [-7, -3], [-2, -12],
+                   [5, -5], [13, -7], [20, 2], [29, 3], [34, 20], [11, 35]]],
+      ["#797b6d", [[-23, 16], [-13, -9], [-7, -3], [-2, -12], [5, -5], [1, 10], [-10, 15]]],
+      ["#353b35", [[1, 10], [13, -7], [20, 2], [29, 3], [24, 15], [9, 25]]]
+    ]) {
+      ctx.beginPath();
+      ctx.moveTo(...points[0]);
+      for (const point of points.slice(1)) ctx.lineTo(...point);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+    stroke(-13, -6, -3, 7, "#a7a79888", 1.1);
+    stroke(13, -4, 11, 14, "#a7a79855", 0.8);
+    ctx.restore();
+  }
+
+  function windNoise(time, salt, interval) {
+    const sample = time / interval;
+    const step = Math.floor(sample);
+    const t = sample - step;
+    const blend = t * t * (3 - 2 * t);
+    function value(index) {
+      let hash = Math.imul(index ^ ribbonSeed ^ salt, 0x9e3779b1);
+      hash = Math.imul(hash ^ (hash >>> 16), 0x85ebca6b);
+      return ((hash ^ (hash >>> 13)) >>> 0) / 0xffffffff * 2 - 1;
+    }
+    return value(step) * (1 - blend) + value(step + 1) * blend;
+  }
+
+  function drawRibbon(time) {
+    const { x, y } = ribbonAnchor;
+    const variant = (Math.imul(ribbonSeed, 0x85ebca6b) >>> 0);
+    const [dark, light] = ribbonColors[variant % ribbonColors.length];
+    const side = variant & 8 ? 1 : -1;
+    const gust = windNoise(time, 41, 2900);
+    const angle = 0.30 + ((variant >>> 8) % 100 / 100) * 0.28 + gust * 0.24;
+    const angleX = side * Math.cos(angle);
+    const angleY = Math.sin(angle);
+    const tail = [];
+    for (let i = 0; i <= 22; i++) {
+      const t = i / 22;
+      const flutter = Math.sin(t * 7.6 + (variant & 7)) * 12 * t
+        + windNoise(time - 1300 * t, 73, 1450) * 14 * t * t;
+      tail.push({
+        x: x + angleX * t * (94 + gust * 10.5) - angleY * flutter,
+        y: y + 4 + angleY * t * 67 + angleX * flutter
+      });
+    }
+    ctx.save();
+    ctx.translate(-82, -128);
+    positionForeground();
+    positionTree();
+    const tip = tail[tail.length - 1];
+    const dye = ctx.createLinearGradient(x, y, tip.x, tip.y);
+    dye.addColorStop(0, dark);
+    dye.addColorStop(0.54, light);
+    dye.addColorStop(1, dark);
+    ctx.beginPath();
+    ctx.moveTo(x - 4, y + 4);
+    for (const [index, p] of tail.entries()) {
+      const width = 4 + 2 * Math.sin(index / 22 * Math.PI);
+      ctx.lineTo(p.x - angleY * width, p.y + angleX * width);
+    }
+    ctx.lineTo(tip.x - angleX * 5, tip.y - angleY * 5);
+    for (const [index, p] of tail.entries()) {
+      const width = 4 + 2 * Math.sin(index / 22 * Math.PI);
+      const q = tail[tail.length - 1 - index];
+      ctx.lineTo(q.x + angleY * width, q.y - angleX * width);
+    }
+    ctx.closePath();
+    ctx.fillStyle = dye;
+    ctx.fill();
+    stroke(x - 4, y - 3, x + 4, y + 4, dark, 3);
+    ctx.restore();
+  }
+
+  function animateRibbon(now) {
+    ctx.drawImage(backdrop, 0, 0);
+    ribbonStarted ??= now;
+    drawRibbon(reducedMotion.matches ? 0 : now - ribbonStarted);
+    if (result) drawFrame();
+    if (!reducedMotion.matches) ribbonFrame = requestAnimationFrame(animateRibbon);
+  }
+
+  function chooseRibbonAnchor(points) {
+    const visible = points.filter(({ x, y }) => {
+      const screenX = 751 - 0.74 * (200 + (x - 200) * art.scale);
+      const screenY = 205 + 0.74 * (590 + (y - 590) * art.scale);
+      return screenX > 115 && screenX < canvas.width - 115 &&
+             screenY > 35 && screenY < canvas.height - 92;
+    });
+    const choices = visible.length ? visible : points;
+    let hash = Math.imul(ribbonSeed ^ (ribbonSeed >>> 16), 0x7feb352d);
+    hash = Math.imul(hash ^ (hash >>> 15), 0x846ca68b);
+    return choices[((hash ^ (hash >>> 16)) >>> 0) % choices.length];
+  }
+
+  function render() {
+    if (ribbonFrame !== undefined) cancelAnimationFrame(ribbonFrame);
+    seed = result ? art.seed : Math.floor(Math.random() * 0x100000000);
+    ribbonSeed = seed;
+    dateOfArtwork = new Date();
+    lunarLabel = result && lunarFormatter.resolvedOptions().calendar === "dangi"
+      ? "음력 · " + lunarFormatter.format(dateOfArtwork)
+      : "";
+    moonAngle = lunarLabel ? moonPhaseAngle(dateOfArtwork) : null;
+    ctx.save();
+    ctx.translate(-82, -128);
+    drawMountains();
+
+    ctx.save();
+    positionForeground();
+    drawRock();
+
+    seed = 37;
+    positionTree();
+    ctx.lineCap = "round";
+    drawWood(bendPath(trunk), 54, 1.6);
+
+    const ribbonPoints = [];
+    for (const [index, branch] of branches.entries()) {
+      const root = trunk[branch.start];
+      const path = samplePath([root.x, root.y], faceBranch(root, branch.curves));
+      const offshoot = offshoots[index + 1];
+
+      const bent = bendPath(path);
+      for (const point of [24, 38, 52]) ribbonPoints.push(bent[point]);
+      drawWood(bent, branch.width, 1);
+      if (offshoot) drawOffshoot(path, offshoot);
+      drawCrown(bent, branch.spread, offshoot?.at);
+    }
+
+    ribbonAnchor = chooseRibbonAnchor(ribbonPoints);
+
+    // Небольшой пучок хвои на верхушке ствола.
+    for (const p of trunk.slice(-18).filter((_, i) => i % 3 === 0)) {
+      const tip = bendPoint(p);
+      drawNeedles(tip.x, tip.y, -Math.PI / 2);
+    }
+    ctx.restore();
+    drawRockNotch();
+    ctx.restore();
+    backdropCtx.drawImage(canvas, 0, 0);
+    ribbonStarted = undefined;
+    ctx.drawImage(backdrop, 0, 0);
+    drawRibbon(0);
+    if (result) drawFrame();
+    if (!reducedMotion.matches) ribbonFrame = requestAnimationFrame(animateRibbon);
+  }
+
+  const regenerate = document.querySelector("#regenerate");
+  regenerate.hidden = result;
+  regenerate.addEventListener("click", render);
+  document.querySelector("#result-actions").hidden = !result;
+  document.querySelector("#save-art").addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.download = "движение-мысли.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+  render();
+
+  }
+  const screens = {
+    home: init_home, menu: init_menu, movement: init_movement,
+    thoughts: init_thoughts, landscape: init_landscape
+  };
+  const titles = {
+    home: "Движение мысли",
+    menu: "Движение мысли · Меню",
+    movement: "Движение · Движение мысли",
+    thoughts: "Мысли · Движение мысли",
+    landscape: "Фрактальное дерево",
+    afterword: "Послесловие · Движение мысли"
+  };
+  const host = document.querySelector("#app");
+  const root = host.attachShadow({ mode: "open" });
+  let currentRoute, stopScreen;
+
+  function navigate(screen, params) {
+    const suffix = params?.toString();
+    location.hash = screen + (suffix ? "?" + suffix : "");
+  }
+
+  function mount() {
+    const [fragment, search = ""] = location.hash.slice(1).split("?", 2);
+    const name = Object.hasOwn(screens, fragment) || fragment === "afterword" ? fragment : "home";
+    const key = name + "?" + search;
+    if (key === currentRoute) return;
+    currentRoute = key;
+    stopScreen?.();
+
+    const target = name === "afterword" ? "menu" : name;
+    const template = document.querySelector("#screen-" + target);
+    host.dataset.screen = name;
+    root.replaceChildren(template.content.cloneNode(true));
+    document.title = titles[name];
+    window.scrollTo(0, 0);
+
+    const controller = new AbortController();
+    const frames = new Set();
+    stopScreen = () => {
+      controller.abort();
+      for (const id of frames) window.cancelAnimationFrame(id);
+      frames.clear();
+    };
+
+    const screenDocument = {
+      querySelector: selector => root.querySelector(selector),
+      createElement: tag => document.createElement(tag)
+    };
+    screens[target](screenDocument, {
+      signal: controller.signal,
+      search,
+      navigate,
+      requestAnimationFrame(callback) {
+        if (controller.signal.aborted) return;
+        const id = window.requestAnimationFrame(time => {
+          frames.delete(id);
+          if (!controller.signal.aborted) callback(time);
+        });
+        frames.add(id);
+        return id;
+      },
+      cancelAnimationFrame(id) {
+        frames.delete(id);
+        window.cancelAnimationFrame(id);
+      }
+    });
+  }
+
+  root.addEventListener("click", event => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey ||
+        event.ctrlKey || event.shiftKey || event.altKey) return;
+    const link = event.target.closest('a[href="#"]');
+    if (!link) return;
+    event.preventDefault();
+    history.pushState(null, "", location.pathname + location.search);
+    mount();
+  });
+  if (location.protocol !== "file:" && location.pathname.endsWith("/index.html")) {
+    history.replaceState(history.state, "", "./" + location.search + location.hash);
+  }
+  window.addEventListener("hashchange", mount);
+  window.addEventListener("popstate", mount);
+  mount();
+  </script>
+</body>
+</html>
