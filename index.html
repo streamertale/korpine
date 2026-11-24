@@ -215,29 +215,12 @@
     }
     .afterword-copy { color: #475248; font-size: 16px; line-height: 1.55; }
     .afterword-copy p { margin: 0 0 14px; }
-    .afterword-copy h2 {
-      margin: 25px 0 12px;
-      padding-top: 18px;
+    .afterword-divider {
+      margin: 26px 0 14px;
+      border: 0;
       border-top: 1px solid #39453c35;
-      color: #39453c;
-      font-size: 19px;
-      font-weight: 600;
     }
-    .afterword-copy ol { margin: 0; padding-inline-start: 1.35em; }
-    .afterword-copy li + li { margin-top: 8px; }
-    .social-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      min-height: 44px;
-      margin-top: 28px;
-      padding: 8px 14px;
-      border: 1px solid #39453c72;
-      color: #39453c;
-      text-decoration: none;
-    }
-    .social-link:hover { background: #39453c0d; }
-    .social-link:focus-visible { outline: 2px solid #39453c; outline-offset: 3px; }
+    .afterword-mountains { display: block; width: 100%; height: auto; }
     .back { color: #505950; font-size: 14px; text-underline-offset: 4px; }
       </style>
   <main>
@@ -250,10 +233,9 @@
       <div class="afterword-copy">
         <p>Медиапроект «Движение мысли» нашёл отображение в образе сосны в корейском пейзаже тушью. Из этого образа возникла идея характера дерева и пейзажа, который меняется от движения руки под действием мысли.</p>
         <p>Движение и мысль иногда пересекаются, а иногда дополняют друг друга. Мысль направляет жест, а жест может подсказать новую мысль. Это диалог, в котором важно удерживать равновесие: давать место и движению, и паузе.</p>
-
-        <a class="social-link" href="https://streamertale.tilda.ws/">
-          www <span aria-hidden="true">↗</span>
-        </a>
+        <hr class="afterword-divider">
+        <canvas class="afterword-mountains" id="afterword-mountains"
+                width="760" height="206" aria-hidden="true"></canvas>
       </div>
     </section>
 
@@ -787,6 +769,38 @@ main {
   
   }
   function init_menu(document, { signal, search, navigate, requestAnimationFrame, cancelAnimationFrame }) {
+
+    function drawAfterwordMountains() {
+      const canvas = document.querySelector("#afterword-mountains");
+      const ink = canvas.getContext("2d");
+      const { width, height } = canvas;
+      ink.clearRect(0, 0, width, height);
+
+      for (const [center, base, relief, opacity] of [
+        [0.31, 127, 77, 0.14], [0.70, 158, 91, 0.25]
+      ]) {
+        const focus = center + (Math.random() - 0.5) * 0.16;
+        const profile = Array.from({ length: 13 }, (_, i) => {
+          const t = i / 12;
+          const slope = Math.max(0, 1 - Math.abs(t - focus) / 0.48);
+          return [t * width, base - relief * slope * (0.75 + Math.random() * 0.25)];
+        });
+        const crest = Math.min(...profile.map(([, y]) => y));
+        const wash = ink.createLinearGradient(0, crest, 0, height);
+        wash.addColorStop(0, `rgba(57, 69, 60, ${opacity})`);
+        wash.addColorStop(1, "rgba(57, 69, 60, 0)");
+        ink.beginPath();
+        ink.moveTo(...profile[0]);
+        for (const point of profile.slice(1)) ink.lineTo(...point);
+        ink.lineTo(width, height);
+        ink.lineTo(0, height);
+        ink.closePath();
+        ink.fillStyle = wash;
+        ink.fill();
+      }
+    }
+
+    drawAfterwordMountains();
 
     const ctx = document.querySelector("#sprig").getContext("2d");
     ctx.scale(2, 2);
